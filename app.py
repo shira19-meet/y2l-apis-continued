@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import requests, json
 app = Flask(__name__)
 
 @app.route('/')
@@ -15,8 +16,28 @@ def study_image():
     # example we covered in the slides! 
 
     # YOUR CODE HERE!
+
+    # you can use the headers to pass in hidden info, here we are sending a secret Key (think of it as a password)
+    headers = {'Authorization': 'Key f2f339a3cc374420a221fa27e58a3202'}
+
+    # this is the url of where your request will go
+    api_url = "https://api.clarifai.com/v2/models/aaa03c23b3724a16a56b629203edc62c/outputs"
     
-    return render_template('home.html', results="No results yet :(")
+    # this is content of the message(data) you are sending to clarifai
+    data ={"inputs": [
+          {
+            "data": {
+              "image": {
+                "url": "https://samples.clarifai.com/metro-north.jpg"
+              }
+            }
+          }
+        ]}
+
+    # putting everything together; sending the request!
+    response = requests.post(api_url, headers=headers, data=json.dumps(data))
+    
+    return render_template('home.html', results=response.content)
 
 if __name__ == '__main__':
     app.run(debug=True)
